@@ -53,8 +53,8 @@ class Event:
         map[1, int(x * resulotion), int(y * resulotion)] += 1
     return map
   
-  def true_position (self):
-    return np.mean([truth.visible_position() for truth in self.truths], axis=0)
+  def true_four_momentum (self):
+    return np.mean([truth.visible_four_momentum() for truth in self.truths], axis=0)
 
 class Cluster:
   def __init__ (self, cluster, fields):
@@ -82,3 +82,6 @@ class Truth:
   
   def invisible_position (self):
     return np.array([self.eta_invis, self.phi_invis])
+  
+  def visible_four_momentum (self):
+    return np.array([self.pt_vis, self.eta_vis, self.phi_vis, self.m_vis])

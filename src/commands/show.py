@@ -1,7 +1,5 @@
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 
 from dataset import *
 from utils import *
@@ -17,17 +15,17 @@ def print_fields (dataset):
   [print(python_name) for _, python_name in dataset._truth_fields]
 
 def plot_event_track_histogram (dataset, index, **options):
-  event_data = dataset[index]
+  event_data = dataset.get_event(index)
   track_positions = np.array([track.position() for track in event_data.tracks if track.eta < 2.5 and track.eta > -2.5 and track.phi < 3.2 and track.phi > -3.2])
   eta_phi_histogram(plt, track_positions, **options)
 
 def plot_event_cluster_histogram (dataset, index, **options):
-  event_data = dataset[index]
+  event_data = dataset.get_event(index)
   cluster_positions = np.array([cluster.position() for cluster in event_data.clusters if cluster.cal_eta < 2.5 and cluster.cal_eta > -2.5 and cluster.cal_phi < 3.2 and cluster.cal_phi > -3.2])
   eta_phi_histogram(plt, cluster_positions, **options)
 
 def plot_event_histrograms (dataset, index, **options):
-  event_data = dataset[index]
+  event_data = dataset.get_event(index)
   track_positions = np.array([track.position() for track in event_data.tracks if track.eta < 2.5 and track.eta > -2.5 and track.phi < 3.2 and track.phi > -3.2])
   cluster_positions = np.array([cluster.position() for cluster in event_data.clusters if cluster.cal_eta < 2.5 and cluster.cal_eta > -2.5 and cluster.cal_phi < 3.2 and cluster.cal_phi > -3.2])
   truth_positions = np.array([truth.visible_position() for truth in event_data.truths if truth.eta_vis < 2.5 and truth.eta_vis > -2.5 and truth.phi_vis < 3.2 and truth.phi_vis > -3.2])
@@ -48,7 +46,7 @@ def histograms_across_events (dataset, callbacks, **options):
   for index in range(len(dataset)):
     if index % 1000 == 0:
       print(f'event {index}')
-    event = dataset[index]
+    event = dataset.get_event(index)
     for i, callback in enumerate(callbacks):
       hists[i].append(callback(event))
 
@@ -62,7 +60,7 @@ def histograms_across_tracks (dataset, callbacks, **options):
   for index in range(len(dataset)):
     if index % 1000 == 0:
       print(f'event {index}')
-    event = dataset[index]
+    event = dataset.get_event(index)
     for i, callback in enumerate(callbacks):
       for track in event.tracks:
         hists[i].append(callback(track))
@@ -78,7 +76,7 @@ def histograms_across_clusters (dataset, callbacks, **options):
   for index in range(len(dataset)):
     if index % 1000 == 0:
       print(f'event {index}')
-    event = dataset[index]
+    event = dataset.get_event(index)
     for i, callback in enumerate(callbacks):
       for cluster in event.clusters:
         hists[i].append(callback(cluster))
@@ -130,16 +128,38 @@ def number_of_tracks_and_average_interactions_heatmap (dataset, **options):
   y_locs = [loc for loc in y_locs if loc >= 0 and loc < 120]
   plt.yticks(y_locs, y_labels)
 
-if __name__ == '__main__':
-  start_time = time.time()
-  dataset = EventsDataset(sys.argv[1])
-  print(f'Loaded dataset with {len(dataset)} events')
-  # print(dataset[0].true_position())
-  # print(dataset[0].map(3))
-  print_map(dataset.get_event(0).true_position_map(100))
-  # plot_event_histrograms(dataset, 3141, cmap='hot')
-  # number_of_tracks_and_average_interactions_heatmap(dataset, cmap='hot')
-  # end_time = time.time()
-  # print(f'Total time: {end_time - start_time}')
-  # print(f'Time per event: {(end_time - start_time) / len(dataset)}')
-  plt.show()
+
+def show (dataset, graph, params):
+  if graph == 'fields':
+    print_fields(dataset)
+    return
+  
+  if graph == 'event_track_histogram':
+    plot_event_track_histogram(dataset, int(params[0]))
+    plt.show()
+    return
+  
+  if graph == 'event_cluster_histogram':
+    plot_event_cluster_histogram(dataset, int(params[0]))
+    plt.show()
+    return
+  
+  if graph == 'event_histograms':
+    plot_event_histrograms(dataset, int(params[0]))
+    plt.show()
+    return
+  
+  if graph == 'clusters_and_tracks_per_event':
+    plot_clusters_and_tracks_per_event(dataset)
+    plt.show()
+    return
+  
+  if graph == 'average_interactions_per_crossing':
+    plot_average_interactions_per_crossing(dataset)
+    plt.show()
+    return
+  
+  if graph == 'number_of_tracks_and_average_interactions_heatmap':
+    number_of_tracks_and_average_interactions_heatmap(dataset)
+    plt.show()
+    return

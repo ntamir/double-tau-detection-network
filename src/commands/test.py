@@ -6,12 +6,10 @@ from torch.optim import Adam
 from torch.utils.data import random_split
 
 from utils import *
-from dataset import EventsDataset
-from model import OriginFindingModule
 
 # try and train the OriginFindingModule with the provided data
-def train_origin_finding_module(dataset):
-  print('initializing training...')
+def test_module(dataset, model, params):
+  print('initializing')
   train_size = int(0.8 * len(dataset))
   test_size = len(dataset) - train_size
   train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
@@ -19,12 +17,6 @@ def train_origin_finding_module(dataset):
   # Create the dataloaders
   train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
   test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
-  print('done')
-
-  # Create the model
-  print('creating model...')
-  model = OriginFindingModule(dataset.resolution)
-  print('done')
 
   # Create the optimizer
   optimizer = Adam(model.parameters(), lr=0.001)
@@ -33,16 +25,14 @@ def train_origin_finding_module(dataset):
   criterion = nn.MSELoss(reduction='sum')
 
   # Train the model
-  print('starting training...')
+  print('training')
   for epoch in range(10):
     print(f'Epoch {epoch}')
     train(train_loader, model, criterion, optimizer, epoch)
-  print('done')
 
   # Test the model
-  print('starting testing...')
+  print('testing')
   test(test_loader, model, criterion)
-  print('done')
 
 # train the model
 def train(train_loader, model, criterion, optimizer, epoch):
@@ -67,9 +57,3 @@ def test(test_loader, model, criterion):
       test_loss += criterion(output, target).item()
       test_loss /= len(test_loader.dataset)
   print(f'\nTest set: Average loss: {test_loss:.4f}\n')
-
-if __name__ == '__main__':
-  resolution = 100
-  dataset = EventsDataset(sys.argv[1], 100)
-  print(f'Loaded dataset with {len(dataset)} events')
-  train_origin_finding_module(dataset)

@@ -14,3 +14,12 @@ def python_name_from_dtype_name(dtype_name):
 # turns the eta position from -pi to pi into a position from 0 to 1 and the phi position from -2.5 to 2.5 into a position from 0 to 1
 def relative_position(position):
   return np.array([(position[0] + np.pi) / (2 * np.pi), (position[1] + 2.5) / 5])
+
+def print_map (map):
+  print('#' * map.shape[0] + '##')
+  for row in map:
+    print('#', end='')
+    for cell in row:
+      print(' ' if cell < 0.5 else round(float(cell)), end='')
+    print('#')
+  print('#' * map.shape[0] + '##')

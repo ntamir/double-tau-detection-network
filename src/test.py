@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from torch.optim import Adam
 from torch.utils.data import random_split
 
+from utils import *
 from dataset import EventsDataset
 from model import OriginFindingModule
 
@@ -22,14 +23,14 @@ def train_origin_finding_module(dataset):
 
   # Create the model
   print('creating model...')
-  model = OriginFindingModule()
+  model = OriginFindingModule(dataset.resolution)
   print('done')
 
   # Create the optimizer
   optimizer = Adam(model.parameters(), lr=0.001)
 
   # Create the loss function
-  criterion = nn.MSELoss()
+  criterion = nn.MSELoss(reduction='sum')
 
   # Train the model
   print('starting training...')
@@ -66,9 +67,9 @@ def test(test_loader, model, criterion):
       test_loss += criterion(output, target).item()
       test_loss /= len(test_loader.dataset)
   print(f'\nTest set: Average loss: {test_loss:.4f}\n')
-    
 
 if __name__ == '__main__':
-  dataset = EventsDataset(sys.argv[1])
+  resolution = 100
+  dataset = EventsDataset(sys.argv[1], 100)
   print(f'Loaded dataset with {len(dataset)} events')
   train_origin_finding_module(dataset)

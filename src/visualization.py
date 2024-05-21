@@ -136,7 +136,7 @@ if __name__ == '__main__':
   print(f'Loaded dataset with {len(dataset)} events')
   # print(dataset[0].true_position())
   # print(dataset[0].map(3))
-  print_fields(dataset)
+  print_map(dataset.get_event(0).true_position_map(100))
   # plot_event_histrograms(dataset, 3141, cmap='hot')
   # number_of_tracks_and_average_interactions_heatmap(dataset, cmap='hot')
   # end_time = time.time()

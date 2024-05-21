@@ -1,5 +1,5 @@
 import sys
-from dataset import EventsDataset
+from data.dataset import EventsDataset
 from model.main import OriginFindingModule
 from utils import datafile_path
 

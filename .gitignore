@@ -1,4 +1,5 @@
 test-pytorch/
 data/
+!src/data/
 src/__pycache__/
 src/modules/__pycache__/

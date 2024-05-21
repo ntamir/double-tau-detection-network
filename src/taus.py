@@ -1,7 +1,7 @@
 import sys
-from datafiles import datafile_path
 from dataset import EventsDataset
-from model import OriginFindingModule
+from model.main import OriginFindingModule
+from utils import datafile_path
 
 from commands.show import show
 from commands.test import test_module

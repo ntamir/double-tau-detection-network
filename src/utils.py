@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+DATA_DIR = 'data'
+
 def python_names_from_dtype(dtype):
   return [python_name_from_dtype_name(name) for name in dtype.names]
 
@@ -23,3 +25,8 @@ def print_map (map):
       print(' ' if cell < 0.5 else round(float(cell)), end='')
     print('#')
   print('#' * map.shape[0] + '##')
+
+
+def datafile_path (name):
+  # go to parent directory of this file, then go to the data directory and add h5 suffix
+  return os.path.join(os.path.dirname(os.path.dirname(__file__)), data_dir, name + '.h5')

@@ -1,7 +1,7 @@
 from torch import nn
 from torch.nn import functional as F
 
-from modules.cylinrical_conv import CylindricalConv2d
+from model.cylinrical_conv import CylindricalConv2d
 
 # This block recieves the array of positions of the tracks and clusters and outputs the number of tau particles at each of the 100 X 100 pixles
 class OriginFindingModule (nn.Module):

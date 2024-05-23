@@ -31,7 +31,7 @@ class EventsDataset (Dataset):
 
   def __getitem__(self, index):
     event = self.get_event(index)
-    return (event.clusters_and_tracks_density_map(self.resolution), event.true_position_map(self.resolution))
+    return (event.clusters_and_tracks_momentum_map(self.resolution), event.true_momentum_map(self.resolution))
 
   def __len__(self):
     return len(self.raw_data['event'])

@@ -1,4 +1,5 @@
 import numpy as np
+from pylorentz import Momentum4
 
 class Track:
   def __init__ (self, track, fields):
@@ -7,3 +8,6 @@ class Track:
 
   def position (self):
     return np.array([self.eta, self.phi])
+  
+  def momentum (self):
+    return Momentum4.m_eta_phi_pt(0, self.eta, self.phi, self.pt)

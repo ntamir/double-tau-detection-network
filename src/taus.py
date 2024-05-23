@@ -1,56 +1,42 @@
 import sys
+import time
 from data.dataset import EventsDataset
-from model.main import OriginFindingModule
-from utils import datafile_path
+from model.main import DoubelTauRegionDetection
+from utils import datafile_path, modelfile_path
 
 from commands.show import show
-from commands.test import test_module
-from commands.train import train
+from commands.train import train_module
 from commands.detect import detect
-from commands.eval import evaluate
 
 RESOLUTION = 100
 
 MODELS = {
-  'origin_finding': lambda: OriginFindingModule(RESOLUTION),
+  'default': lambda: DoubelTauRegionDetection(RESOLUTION),
 }
+
+data_file = 'ggXtautau_mX20_run3year1'
 
 if __name__ == '__main__':
   command = sys.argv[1]
-  filename = sys.argv[2]
-  dataset = EventsDataset(datafile_path(filename), RESOLUTION)
+  dataset = EventsDataset(datafile_path(data_file), RESOLUTION)
 
   if command == 'show':
-    graph_name = sys.argv[3]
-    params = sys.argv[4:]
+    graph_name = sys.argv[2]
+    params = sys.argv[3:]
     show(dataset, graph_name, params)
     exit()
 
-  if command == 'test':
-    module = MODELS[sys.argv[3]]()
-    params = sys.argv[4:]
-    test_module(dataset, module, params)
-    exit()
-
   if command == 'train':
-    module = MODELS[sys.argv[3]]()
-    output = sys.argv[4]
-    params = sys.argv[5:]
-    train(dataset, module, output, params)
+    module = MODELS[sys.argv[2]]() if len(sys.argv) > 2 else MODELS['default']()
+    output = modelfile_path(sys.argv[3]) if len(sys.argv) > 3 else modelfile_path('model_' + str(round(time.time() * 1000)))
+    train_module(dataset, module, output)
     exit()
 
   if command == 'detect':
-    module = MODELS[sys.argv[3]]()
-    weights_file = sys.argv[4]
-    params = sys.argv[5:]
-    detect(dataset, module, weights_file, params)
-    exit()
-
-  if command == 'evaluate':
-    module = MODELS[sys.argv[3]]()
-    weights_file = sys.argv[4]
-    params = sys.argv[5:]
-    evaluate(dataset, module, weights_file, params)
+    module = MODELS[sys.argv[2] or 'default']()
+    model_file = modelfile_path(sys.argv[2])
+    params = sys.argv[4:]
+    detect(dataset, module, model_file)
     exit()
 
   print(f'Unknown command: {command}')

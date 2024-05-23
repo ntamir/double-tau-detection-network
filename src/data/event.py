@@ -25,12 +25,18 @@ class Event:
         map[1, int(x * resulotion), int(y * resulotion)] += 1
     return map
   
-  def pt_map (self, resulotion):
-    map = np.zeros((resulotion, resulotion), dtype=np.float32)
+  def clusters_and_tracks_momentum_map (self, resulotion):
+    map = np.zeros((2, resulotion, resulotion), dtype=np.float32)
     for cluster in self.clusters:
       x, y = relative_position(cluster.position())
       if (x > 0 and x < 1 and y > 0 and y < 1):
-        map[int(x * resulotion), int(y * resulotion)] += cluster.pt
+        momentum = cluster.momentum()
+        map[0, int(x * resulotion), int(y * resulotion)] += momentum.p_t
+        pass
+    for track in self.tracks:
+      x, y = relative_position(track.position())
+      if (x > 0 and x < 1 and y > 0 and y < 1):
+        map[1, int(x * resulotion), int(y * resulotion)] += track.pt
     return map
   
   def true_position (self):
@@ -42,6 +48,14 @@ class Event:
       x, y = relative_position(truth.visible_position())
       if (x > 0 and x < 1 and y > 0 and y < 1):
         map[int(x * resulotion), int(y * resulotion)] += 1
+    return map
+  
+  def true_momentum_map (self, resulotion):
+    map = np.zeros((resulotion, resulotion), dtype=np.float32)
+    for truth in self.truths:
+      x, y = relative_position(truth.visible_position())
+      if (x > 0 and x < 1 and y > 0 and y < 1):
+        map[int(x * resulotion), int(y * resulotion)] += truth.visible_momentum().p_t
     return map
   
   def true_four_momentum (self):

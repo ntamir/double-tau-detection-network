@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 DATA_DIR = 'data'
 
@@ -29,4 +30,8 @@ def print_map (map):
 
 def datafile_path (name):
   # go to parent directory of this file, then go to the data directory and add h5 suffix
-  return os.path.join(os.path.dirname(os.path.dirname(__file__)), data_dir, name + '.h5')
+  return os.path.join(os.path.dirname(os.path.dirname(__file__)), DATA_DIR, name + '.h5')
+
+def modelfile_path (name):
+  # go to parent directory of this file, then go to the models directory and add pth suffix
+  return os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', name + '.pth')

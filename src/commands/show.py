@@ -19,6 +19,13 @@ def print_fields (dataset):
   print('Truth fields:')
   [print(python_name) for _, python_name in dataset._truth_fields]
 
+def print_sample_input_and_target (dataset, index):
+  (input, target) = dataset[index]
+  print('Input:')
+  print(input)
+  print('Target:')
+  print(target)
+
 def plot_event_track_histogram (dataset, index, **options):
   event_data = dataset.get_event(index)
   track_positions = np.array([track.position() for track in event_data.tracks if track.eta < 2.5 and track.eta > -2.5 and track.phi < 3.2 and track.phi > -3.2])
@@ -217,3 +224,27 @@ def show (dataset, graph, params):
   if graph == 'event_pt_histogram':
     plot_event_pt_histogram(dataset, int(params[0]))
     return
+  
+  if graph == 'sample_input_and_target':
+    print_sample_input_and_target(dataset, int(params[0]))
+    return
+  
+  if graph == 'field_value':
+    field = params[0]
+    event = dataset.get_event(int(params[1]))
+    if field in event.__dict__:
+      print(event.__dict__[field])
+      return
+    if field in event.clusters[0].__dict__:
+      print(event.clusters[0].__dict__[field])
+      return
+    
+    if field in event.tracks[0].__dict__:
+      print(event.tracks[0].__dict__[field])
+      return
+    
+    if field in event.truths[0].__dict__:
+      print(event.truths[0].__dict__[field])
+      return
+  
+  print(f'Unknown graph: {graph}')

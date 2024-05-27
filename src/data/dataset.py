@@ -20,6 +20,7 @@ class EventsDataset (Dataset):
   def get_event(self, index):
     if index in self.cache:
       return self.cache[index]
+
     event = self.raw_data['event'][index]
     clusters = self.raw_data['clusters'][index]
     tracks = self.raw_data['tracks'][index]
@@ -31,7 +32,24 @@ class EventsDataset (Dataset):
 
   def __getitem__(self, index):
     event = self.get_event(index)
-    return (event.clusters_and_tracks_momentum_map(self.resolution), event.true_momentum_map(self.resolution))
+
+    cluster_channel_providers = [
+      lambda cluster: cluster.momentum().p_t,
+      lambda cluster: 1,
+    ]
+
+    track_channel_providers = [
+      lambda track: track.pt,
+      lambda track: 1,
+    ]
+    
+    input = (
+      event.clusters_map(self.resolution, cluster_channel_providers),
+      event.tracks_map(self.resolution, track_channel_providers)
+    )
+    target = event.true_momentum_map(self.resolution)
+
+    return input, target
 
   def __len__(self):
     return len(self.raw_data['event'])

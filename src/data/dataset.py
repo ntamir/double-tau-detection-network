@@ -35,4 +35,3 @@ class EventsDataset (Dataset):
 
   def __len__(self):
     return len(self.raw_data['event'])
-  

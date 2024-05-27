@@ -165,7 +165,7 @@ def number_of_tracks_and_average_interactions_heatmap (dataset, **options):
   plt.yticks(y_locs, y_labels)
   plt.show()
 
-def clusters_per_pixel (dataset):
+def clusters_per_pixel (dataset, **options):
   resolution = dataset.resolution
   hist = np.zeros(len(dataset) * resolution * resolution)
   for index in range(len(dataset)):
@@ -178,7 +178,7 @@ def clusters_per_pixel (dataset):
         hist[index * resolution * resolution + int(x * resolution) * resolution + int(y * resolution)] += 1
   
   print('show histogram')
-  plt.hist(hist, bins=range(0, 10, 1))
+  plt.hist(hist, bins=range(0, 10, 1), **options)
   plt.show()
 
 def show (dataset, graph, params):
@@ -199,11 +199,11 @@ def show (dataset, graph, params):
     return
   
   if graph == 'clusters_and_tracks_per_event':
-    plot_clusters_and_tracks_per_event(dataset)
+    plot_clusters_and_tracks_per_event(dataset, log=True)
     return
   
   if graph == 'average_interactions_per_crossing':
-    plot_average_interactions_per_crossing(dataset)
+    plot_average_interactions_per_crossing(dataset, log=True)
     return
   
   if graph == 'number_of_tracks_and_average_interactions_heatmap':
@@ -211,7 +211,7 @@ def show (dataset, graph, params):
     return
   
   if graph == 'clusters_per_pixel':
-    clusters_per_pixel(dataset)
+    clusters_per_pixel(dataset, log=True)
     return
   
   if graph == 'event_pt_histogram':

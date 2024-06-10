@@ -35,9 +35,7 @@ class DoubelTauRegionDetection (nn.Module):
     trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
     print("Initialized NN with {} trainable parameters".format(trainable_params))
 
-  def forward(self, x):
-    clusters, tracks = x
-
+  def forward(self, clusters, tracks):
     for layer in self.track_layers:
       tracks = layer(tracks)
 

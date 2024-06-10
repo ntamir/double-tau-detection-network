@@ -47,6 +47,7 @@ class EventsDataset (Dataset):
       event.clusters_map(self.resolution, cluster_channel_providers),
       event.tracks_map(self.resolution, track_channel_providers)
     )
+    
     target = event.true_momentum_map(self.resolution)
 
     return input, target

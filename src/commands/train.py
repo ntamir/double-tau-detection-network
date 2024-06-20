@@ -7,14 +7,11 @@ from torch.utils.data import random_split
 
 import matplotlib.pyplot as plt
 
-from utils import *
-
-EPOCHS = 10
+EPOCHS = 100
 BATCH_SIZE = 32
 
 TRAINING_PERCENTAGE = 0.7
 VALIDATION_PERCENTAGE = 0.2
-TEST_PERCENTAGE = 1 - TRAINING_PERCENTAGE - VALIDATION_PERCENTAGE
 
 def train_module(dataset, model, output):
   start_time = time.time()
@@ -65,12 +62,16 @@ def train_module(dataset, model, output):
   plt.plot(range(EPOCHS), [loss[1] for loss in losses], label='Validation Loss')
   plt.xlabel('Epoch')
   plt.ylabel('Loss')
+  plt.yscale('log')
+  plt.legend()
+  plt.savefig(output + '.png')
   plt.show()
+
 
 def init_dataloaders (dataset):
   train_size = int(len(dataset) * TRAINING_PERCENTAGE)
   validation_size = int(len(dataset) * VALIDATION_PERCENTAGE)
-  test_size = int(len(dataset) * TEST_PERCENTAGE)
+  test_size = len(dataset) - train_size - validation_size
 
   train_dataset, validation_dataset, test_dataset = random_split(dataset, [train_size, validation_size, test_size])
   
@@ -84,16 +85,16 @@ def init_dataloaders (dataset):
 def train(train_loader, model, criterion, optimizer):
   total_loss = 0
   model.train()
-  for batch_idx, ((clusters_input, tracks_input), target) in enumerate(train_loader):
+  for batch_idx, (inputs, target) in enumerate(train_loader):
     optimizer.zero_grad()
-    output = model(clusters_input, tracks_input)
+    output = model(*inputs)
     loss = criterion(output, target)
     loss.backward()
     optimizer.step()
     total_loss += loss.item()
     if batch_idx % 10 == 0:
       print(f'training [{batch_idx * BATCH_SIZE}/{len(train_loader.dataset)}'
-            f'({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item() / BATCH_SIZE:.4f}')
+            f'({100. * batch_idx / len(train_loader):.0f}%)]\t\tLoss: {loss.item() / BATCH_SIZE:.4f}')
   return total_loss / len(train_loader)
 
 # validate the model
@@ -101,22 +102,25 @@ def validate(val_loader, model, criterion):
   model.eval()
   total_loss = 0
   with torch.no_grad():
-    for batch_idx, ((clusters_input, tracks_input), target) in enumerate(val_loader):
-      output = model(clusters_input, tracks_input)
+    for batch_idx, (inputs, target) in enumerate(val_loader):
+      output = model(*inputs)
       loss = criterion(output, target)
       total_loss += loss.item()
       if batch_idx % 10 == 0:
         print(f'validating [{batch_idx * BATCH_SIZE}/{len(val_loader.dataset)}'
-              f'({100. * batch_idx / len(val_loader):.0f}%)]\tLoss: {loss.item() / BATCH_SIZE:.4f}')
+              f'({100. * batch_idx / len(val_loader):.0f}%)]\t\tLoss: {loss.item() / BATCH_SIZE:.4f}')
   return total_loss / len(val_loader)
 
 # test the model
 def test(test_loader, model, criterion):
   model.eval()
-  test_loss = 0
+  total_loss = 0
   with torch.no_grad():
-    for batch_idx, ((clusters_input, tracks_input), target) in enumerate(test_loader):
-      output = model(clusters_input, tracks_input)
-      test_loss += criterion(output, target).item()
-      test_loss /= len(test_loader.dataset)
-  print(f'\nTest set: Average loss: {test_loss:.4f}\n')
+    for batch_idx, (inputs, target) in enumerate(test_loader):
+      output = model(*inputs)
+      loss = criterion(output, target)
+      total_loss += loss.item()
+      if batch_idx % 10 == 0:
+        print(f'testing [{batch_idx * BATCH_SIZE}/{len(test_loader.dataset)}'
+              f'({100. * batch_idx / len(test_loader):.0f}%)]\t\tLoss: {loss.item():.4f}')
+  print(f'\nTest set average loss: {total_loss / len(test_loader):.4f}\n')

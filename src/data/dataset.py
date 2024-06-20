@@ -35,12 +35,18 @@ class EventsDataset (Dataset):
 
     cluster_channel_providers = [
       lambda cluster: cluster.momentum().p_t,
-      lambda cluster: 1,
+      lambda cluster: cluster.center_mag,
+      lambda cluster: cluster.center_lambda,
+      lambda cluster: cluster.second_r,
+      lambda cluster: cluster.second_lambda
     ]
 
     track_channel_providers = [
       lambda track: track.pt,
-      lambda track: 1,
+      lambda track: track.number_of_pixel_hits,
+      lambda track: track.number_of_sct_hits,
+      lambda track: track.number_of_trt_hits,
+      lambda track: track.q_over_p
     ]
     
     input = (

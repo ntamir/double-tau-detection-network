@@ -12,14 +12,14 @@ class DoubelTauRegionDetection (nn.Module):
     # seperate convolutional networks for the tracks and clusters, then mereged using a fully connected network
 
     self.track_layers = nn.ModuleList([
-      CylindricalConv2d(2, 16, kernel_size=3, padding=1),
+      CylindricalConv2d(5, 16, kernel_size=3, padding=1),
       nn.MaxPool2d(2),
       CylindricalConv2d(16, 16, kernel_size=3, padding=1),
       nn.MaxPool2d(2)
     ])
 
     self.cluster_layers = nn.ModuleList([
-      CylindricalConv2d(2, 16, kernel_size=3, padding=1),
+      CylindricalConv2d(5, 16, kernel_size=3, padding=1),
       nn.MaxPool2d(2),
       CylindricalConv2d(16, 16, kernel_size=3, padding=1),
       nn.MaxPool2d(2)

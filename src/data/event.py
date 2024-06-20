@@ -1,10 +1,16 @@
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 from utils import relative_position
 
 from data.cluster import Cluster
 from data.track import Track
 from data.tau_truth import Truth
+
+FIELDS_TO_NORMALIZE = {
+  'clusters': ['center_mag', 'center_lambda', 'second_r', 'second_lambda'],
+  'tracks': ['number_of_pixel_hits', 'number_of_sct_hits', 'number_of_trt_hits', 'q_over_p'],
+}
 
 class Event:
   def __init__ (self, event, clusters, tracks, truth, cluster_fields, track_fields, truth_fields):
@@ -17,15 +23,25 @@ class Event:
     self.normalize()
 
   def normalize (self):
+    def normzlied (values):
+      values = np.array(values).reshape(-1, 1)
+      return StandardScaler().fit_transform(values).reshape(-1)
+
     # normalize clusters
     total_energy = sum([cluster.cal_e for cluster in self.clusters])
-    for cluster in self.clusters:
+    cluster_normalized_fields = { field: normzlied([getattr(cluster, field) for cluster in self.clusters]) for field in FIELDS_TO_NORMALIZE['clusters'] }
+    for index, cluster in enumerate(self.clusters):
       cluster.cal_e /= total_energy
+      for field in FIELDS_TO_NORMALIZE['clusters']:
+        setattr(cluster, field, cluster_normalized_fields[field][index])
     
     # normalize tracks
     total_pt = sum([track.pt for track in self.tracks])
-    for track in self.tracks:
+    track_normalized_fields = { field: normzlied([getattr(track, field) for track in self.tracks]) for field in FIELDS_TO_NORMALIZE['tracks'] }
+    for index, track in enumerate(self.tracks):
       track.pt /= total_pt
+      for field in FIELDS_TO_NORMALIZE['tracks']:
+        setattr(track, field, track_normalized_fields[field][index])
 
   def calculate_and_cache (self, key, calculation):
     if key not in self._calculateion_cache:

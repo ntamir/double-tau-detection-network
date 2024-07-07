@@ -19,34 +19,37 @@ class Event:
     self.tracks = [Track(track, track_fields) for track in tracks if track['valid']]
     self.truths = [Truth(truth, truth_fields) for truth in truth if truth['valid']]
     self._calculateion_cache = {}
+    self.clusters_scaler = StandardScaler()
+    self.tracks_scaler = StandardScaler()
 
     self.normalize()
 
   def normalize (self):
-    def normzlied (values):
-      values = np.array(values).reshape(-1, 1)
-      return StandardScaler().fit_transform(values).reshape(-1)
-
     # normalize clusters
+    normalizable_clusters_fields_values = np.array([[getattr(cluster, field) for cluster in self.clusters] for field in FIELDS_TO_NORMALIZE['clusters']]).T
+    normalized_cluster_fields_values = self.clusters_scaler.fit_transform(normalizable_clusters_fields_values)
     total_energy = sum([cluster.cal_e for cluster in self.clusters])
-    cluster_normalized_fields = { field: normzlied([getattr(cluster, field) for cluster in self.clusters]) for field in FIELDS_TO_NORMALIZE['clusters'] }
     for index, cluster in enumerate(self.clusters):
       cluster.cal_e /= total_energy
       for field in FIELDS_TO_NORMALIZE['clusters']:
-        setattr(cluster, field, cluster_normalized_fields[field][index])
+        setattr(cluster, field, normalized_cluster_fields_values[index][FIELDS_TO_NORMALIZE['clusters'].index(field)])
     
     # normalize tracks
+    normalizable_tracks_fields_values = np.array([[getattr(track, field) for track in self.tracks] for field in FIELDS_TO_NORMALIZE['tracks']]).T
+    normalized_track_fields_values = self.tracks_scaler.fit_transform(normalizable_tracks_fields_values)
     total_pt = sum([track.pt for track in self.tracks])
-    track_normalized_fields = { field: normzlied([getattr(track, field) for track in self.tracks]) for field in FIELDS_TO_NORMALIZE['tracks'] }
     for index, track in enumerate(self.tracks):
       track.pt /= total_pt
       for field in FIELDS_TO_NORMALIZE['tracks']:
-        setattr(track, field, track_normalized_fields[field][index])
+        setattr(track, field, normalized_track_fields_values[index][FIELDS_TO_NORMALIZE['tracks'].index(field)])
 
   def calculate_and_cache (self, key, calculation):
     if key not in self._calculateion_cache:
       self._calculateion_cache[key] = calculation()
     return self._calculateion_cache[key]
+
+  def normalization_factors (self):
+    return np.array([self.clusters_scaler.mean_, self.clusters_scaler.var_, self.tracks_scaler.mean_, self.tracks_scaler.var_]).flatten()
 
   # input types
 
@@ -108,7 +111,7 @@ class Event:
   # target types
   
   def true_position (self):
-    return self.calculate_and_cache('true_position', lambda: [truth.position() for truth in self.truths])
+    return self.calculate_and_cache('true_position', lambda: [truth.visible_position() for truth in self.truths])
   
   def true_position_map (self, resulotion):
     def calculate ():

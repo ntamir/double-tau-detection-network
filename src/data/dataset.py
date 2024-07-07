@@ -1,4 +1,5 @@
 import h5py
+from progress.bar import IncrementalBar
 from torch.utils.data import Dataset
 import numpy as np
 
@@ -8,14 +9,9 @@ from utils import *
 class EventsDataset (Dataset):
   def __init__(self, source_file, resolution=100):
     super().__init__()
-    self.source_file = source_file
-    self.raw_data = h5py.File(source_file, 'r')
+    self.load(source_file)
     self.cache = {}
     self.resolution = resolution
-
-    self._cluster_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['clusters'].dtype.names]
-    self._track_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['tracks'].dtype.names]
-    self._truth_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['truthTaus'].dtype.names]
 
   def get_event(self, index):
     if index in self.cache:
@@ -54,9 +50,24 @@ class EventsDataset (Dataset):
       event.tracks_map(self.resolution, track_channel_providers)
     )
     
-    target = event.true_momentum_map(self.resolution)
+    target = np.array(event.true_position()).flatten()[:4]
 
     return input, target
 
   def __len__(self):
     return len(self.raw_data['event'])
+  
+  # io operations
+
+  def save (self, filename):
+    with h5py.File(filename, 'w') as f:
+      for key in self.raw_data:
+        f.create_dataset(key, data=self.raw_data[key])
+
+  def load(self, source_file):
+    self.source_file = source_file
+    self.raw_data = h5py.File(source_file, 'r')
+
+    self._cluster_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['clusters'].dtype.names]
+    self._track_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['tracks'].dtype.names]
+    self._truth_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['truthTaus'].dtype.names]

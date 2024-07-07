@@ -4,14 +4,18 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim import Adam
 from torch.utils.data import random_split
-
 import matplotlib.pyplot as plt
+from progress.bar import IncrementalBar
+import numpy as np
+
+from visualization import plot_results
 
 EPOCHS = 100
-BATCH_SIZE = 32
+BATCH_SIZE = 512
 
 TRAINING_PERCENTAGE = 0.7
 VALIDATION_PERCENTAGE = 0.2
+TEST_ARROWS_PERCENTAGE = 0.1 
 
 def train_module(dataset, model, output):
   start_time = time.time()
@@ -20,7 +24,7 @@ def train_module(dataset, model, output):
   print(f'training over {len(train_loader.dataset)} samples, validating over {len(validation_loader.dataset)} samples, testing over {len(test_loader.dataset)} samples')
 
   # Create the optimizer
-  optimizer = Adam(model.parameters(), lr=0.001)
+  optimizer = Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
 
   # Create the loss function
   criterion = nn.MSELoss()
@@ -46,8 +50,11 @@ def train_module(dataset, model, output):
 
   # Test the best model
   test_start_time = time.time()
-  print('testing')
-  test(test_loader, model, criterion)
+  if len(test_loader) > 0:
+    print('testing')
+    test(test_loader, model, criterion, dataset)
+  else:
+    print('skipping testing')
 
   # Save the model
   torch.save(model.state_dict(), output)
@@ -85,6 +92,7 @@ def init_dataloaders (dataset):
 def train(train_loader, model, criterion, optimizer):
   total_loss = 0
   model.train()
+  bar = IncrementalBar('Processing', max=len(train_loader))
   for batch_idx, (inputs, target) in enumerate(train_loader):
     optimizer.zero_grad()
     output = model(*inputs)
@@ -92,35 +100,47 @@ def train(train_loader, model, criterion, optimizer):
     loss.backward()
     optimizer.step()
     total_loss += loss.item()
-    if batch_idx % 10 == 0:
-      print(f'training [{batch_idx * BATCH_SIZE}/{len(train_loader.dataset)}'
-            f'({100. * batch_idx / len(train_loader):.0f}%)]\t\tLoss: {loss.item() / BATCH_SIZE:.4f}')
+    bar.next()
+    bar.suffix = f'[{(batch_idx + 1) * BATCH_SIZE}/{len(train_loader.dataset)} %(percent).1f%%]\t\tLoss: {loss.item() / BATCH_SIZE:.4f}'
+  bar.suffix = f'Loss: {total_loss / len(train_loader)}'
+  bar.finish()
   return total_loss / len(train_loader)
 
 # validate the model
 def validate(val_loader, model, criterion):
   model.eval()
   total_loss = 0
+  bar = IncrementalBar('Processing', max=len(val_loader))
   with torch.no_grad():
     for batch_idx, (inputs, target) in enumerate(val_loader):
       output = model(*inputs)
       loss = criterion(output, target)
       total_loss += loss.item()
-      if batch_idx % 10 == 0:
-        print(f'validating [{batch_idx * BATCH_SIZE}/{len(val_loader.dataset)}'
-              f'({100. * batch_idx / len(val_loader):.0f}%)]\t\tLoss: {loss.item() / BATCH_SIZE:.4f}')
+      bar.next()
+      bar.suffix = f'[{(batch_idx + 1) * BATCH_SIZE}/{len(val_loader.dataset)} %(percent).1f%%]\t\tLoss: {loss.item() / BATCH_SIZE:.4f}'
+  bar.suffix = f'Loss: {total_loss / len(val_loader)}'
+  bar.finish()
   return total_loss / len(val_loader)
 
 # test the model
-def test(test_loader, model, criterion):
+def test(test_loader, model, criterion, dataset):
   model.eval()
   total_loss = 0
+  outputs, targets = [], []
+  random_indeces = np.random.choice(len(test_loader.dataset), int(TEST_ARROWS_PERCENTAGE * len(test_loader.dataset)), replace=False)
+  bar = IncrementalBar('Processing', max=len(test_loader))
   with torch.no_grad():
     for batch_idx, (inputs, target) in enumerate(test_loader):
       output = model(*inputs)
       loss = criterion(output, target)
       total_loss += loss.item()
-      if batch_idx % 10 == 0:
-        print(f'testing [{batch_idx * BATCH_SIZE}/{len(test_loader.dataset)}'
-              f'({100. * batch_idx / len(test_loader):.0f}%)]\t\tLoss: {loss.item():.4f}')
+      bar.next()
+      bar.suffix = f'[{(batch_idx + 1) * BATCH_SIZE}/{len(test_loader.dataset)} %(percent).1f%%]\t\tLoss: {loss.item() / BATCH_SIZE:.4f}'
+      for index, (output, target) in enumerate(zip(output, target)):
+        if batch_idx * BATCH_SIZE + index in random_indeces:
+          outputs.append(output)
+          targets.append(target)
+  bar.suffix = f'Loss: {total_loss / len(test_loader):.4f}'
+  bar.finish()
   print(f'\nTest set average loss: {total_loss / len(test_loader):.4f}\n')
+  plot_results(outputs, targets)

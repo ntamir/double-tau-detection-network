@@ -1,10 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+from datetime import datetime
+from progress.bar import IncrementalBar
 
 import matplotlib.colors as colors
 import matplotlib.patches as patches
 
 from data.dataset import *
+from data.event import *
 from utils import *
 
 PLOT_SIZE = 6
@@ -18,6 +22,17 @@ def print_fields (dataset):
   print()
   print('Truth fields:')
   [print(python_name) for _, python_name in dataset._truth_fields]
+
+def field_value (event, field):
+  if field in event.__dict__:
+    return event.__dict__[field]
+  if field in event.clusters[0].__dict__:
+    return [cluster[0].__dict__[field] for cluster in event.clusters]
+  if field in event.tracks[0].__dict__:
+    return [track[0].__dict__[field] for track in event.tracks]
+  if field in event.truths[0].__dict__:
+    return [truth[0].__dict__[field] for truth in event.truths]
+  return None
 
 def print_sample_input_and_target (dataset, index):
   (input, target) = dataset[index]
@@ -81,9 +96,9 @@ def plot_average_interactions_per_crossing (dataset, **options):
 def histograms_across_events (dataset, callbacks, **options):
   # build a histogram for every callback function
   hists = [ [] for _ in range(len(callbacks)) ]
+  bar = IncrementalBar('Processing', max=len(dataset))
   for index in range(len(dataset)):
-    if index % 1000 == 0:
-      print(f'event {index}')
+    bar.next()
     event = dataset.get_event(index)
     for i, callback in enumerate(callbacks):
       hists[i].append(callback(event))
@@ -95,9 +110,9 @@ def histograms_across_events (dataset, callbacks, **options):
 def histograms_across_tracks (dataset, callbacks, **options):
   # build a histogram for every callback function
   hists = [ [] for _ in range(len(callbacks))]
+  bar = IncrementalBar('Processing', max=len(dataset))
   for index in range(len(dataset)):
-    if index % 1000 == 0:
-      print(f'event {index}')
+    bar.next()
     event = dataset.get_event(index)
     for i, callback in enumerate(callbacks):
       for track in event.tracks:
@@ -111,9 +126,9 @@ def histograms_across_tracks (dataset, callbacks, **options):
 def histograms_across_clusters (dataset, callbacks, **options):
   # build a histogram for every callback function
   hists = [ [] for _ in range(len(callbacks))]
+  bar = IncrementalBar('Processing', max=len(dataset))
   for index in range(len(dataset)):
-    if index % 1000 == 0:
-      print(f'event {index}')
+    bar.next()
     event = dataset.get_event(index)
     for i, callback in enumerate(callbacks):
       for cluster in event.clusters:
@@ -150,10 +165,10 @@ def number_of_tracks_and_average_interactions_heatmap (dataset, **options):
   tracks_res = 120
   plot_average_interactions_per_crossing_res = 120
   hist = np.zeros([tracks_res, plot_average_interactions_per_crossing_res])
+  bar = IncrementalBar('Processing', max=len(dataset))
   for index in range(len(dataset)):
+    bar.next()
     event = dataset.get_event(index)
-    if index % 100 == 0:
-      print(f'event {index}')
     tracks_bin = int((len(event.tracks) - 1) / 1200 * tracks_res)
     average_interactions_per_crossing_bin = int(event.average_interactions_per_crossing)
     hist[tracks_bin, average_interactions_per_crossing_bin] += 1
@@ -175,10 +190,10 @@ def number_of_tracks_and_average_interactions_heatmap (dataset, **options):
 def clusters_per_pixel (dataset, **options):
   resolution = dataset.resolution
   hist = np.zeros(len(dataset) * resolution * resolution)
+  bar = IncrementalBar('Processing', max=len(dataset))
   for index in range(len(dataset)):
+    bar.next()
     event = dataset.get_event(index)
-    if index % 100 == 0:
-      print(f'event {index}')
     for cluster in event.clusters:
       x, y = relative_position(cluster.position())
       if (x > 0 and x < 1 and y > 0 and y < 1):
@@ -186,6 +201,26 @@ def clusters_per_pixel (dataset, **options):
   
   print('show histogram')
   plt.hist(hist, bins=range(0, 10, 1), **options)
+  plt.show()
+
+def show_normalization_histograms (dataset, **options):
+  normalization_factors_length = len(dataset.get_event(0).normalization_factors())
+  hists = np.zeros((normalization_factors_length, len(dataset)))
+  bar = IncrementalBar('Processing', max=len(dataset))
+  for index in range(len(dataset)):
+    bar.next()
+    event = dataset.get_event(index)
+    for i, factor in enumerate(event.normalization_factors()):
+      hists[i, index] = factor
+  # create multiple histograms
+  fig, axes = plt.subplots(2, 8, figsize=[PLOT_SIZE, PLOT_SIZE * normalization_factors_length])
+  clusters_titles = [f"{title} mean" for title in FIELDS_TO_NORMALIZE['clusters']] + [f"{title} variance" for title in FIELDS_TO_NORMALIZE['clusters']]
+  tracks_titles = [f"{title} mean" for title in FIELDS_TO_NORMALIZE['tracks']] + [f"{title} variance" for title in FIELDS_TO_NORMALIZE['tracks']]
+  titles = clusters_titles + tracks_titles
+  for index, hist in enumerate(hists):
+    axes[int(index / 8)][index % 8].hist(hist, bins=100, **options)
+    axes[int(index / 8)][index % 8].set_title(titles[index])
+    axes[int(index / 8)][index % 8].figure.savefig(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'images', f'{titles[index]}_{datetime.now().strftime("%Y%m%d-%H%M%S")}.png'))
   plt.show()
 
 def show (dataset, graph, params):
@@ -230,21 +265,16 @@ def show (dataset, graph, params):
     return
   
   if graph == 'field_value':
+    print(field_value(dataset.get_event(int(params[1])), params[0]))
+    
+  if graph == 'field_across_events':
     field = params[0]
-    event = dataset.get_event(int(params[1]))
-    if field in event.__dict__:
-      print(event.__dict__[field])
-      return
-    if field in event.clusters[0].__dict__:
-      print(event.clusters[0].__dict__[field])
-      return
-    
-    if field in event.tracks[0].__dict__:
-      print(event.tracks[0].__dict__[field])
-      return
-    
-    if field in event.truths[0].__dict__:
-      print(event.truths[0].__dict__[field])
-      return
+    histograms_across_events(dataset, [lambda event: field_value(event, field)], log=True)
+    plt.show()
+    return
+  
+  if graph == 'normalization_histograms':
+    show_normalization_histograms(dataset)
+    return
   
   print(f'Unknown graph: {graph}')

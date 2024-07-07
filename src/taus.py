@@ -7,6 +7,7 @@ from utils import datafile_path, modelfile_path
 from commands.show import show
 from commands.train import train_module
 from commands.detect import detect
+from commands.proliferate import proliferate
 
 RESOLUTION = 100
 
@@ -37,6 +38,11 @@ if __name__ == '__main__':
     model_file = modelfile_path(sys.argv[2])
     params = sys.argv[4:]
     detect(dataset, module, model_file)
+    exit()
+
+  if command == 'proliferate':
+    factor = int(sys.argv[2])
+    proliferate(dataset, factor)
     exit()
 
   print(f'Unknown command: {command}')

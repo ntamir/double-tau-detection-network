@@ -44,15 +44,13 @@ class EventsDataset (Dataset):
       lambda track: track.number_of_trt_hits,
       lambda track: track.q_over_p
     ]
-    
-    input = (
-      event.clusters_map(self.resolution, cluster_channel_providers),
-      event.tracks_map(self.resolution, track_channel_providers)
-    )
-    
+
+    clusters_map = event.clusters_map(self.resolution, cluster_channel_providers)
+    tracks_map = event.tracks_map(self.resolution, track_channel_providers)
+    inputs = (np.concatenate([clusters_map, tracks_map], axis=0),)
     target = np.array(event.true_position()).flatten()[:4]
 
-    return input, target
+    return inputs, target
 
   def __len__(self):
     return len(self.raw_data['event'])

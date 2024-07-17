@@ -28,18 +28,18 @@ class Event:
     # normalize clusters
     normalizable_clusters_fields_values = np.array([[getattr(cluster, field) for cluster in self.clusters] for field in FIELDS_TO_NORMALIZE['clusters']]).T
     normalized_cluster_fields_values = self.clusters_scaler.fit_transform(normalizable_clusters_fields_values)
-    total_energy = sum([cluster.cal_e for cluster in self.clusters])
+    max_energy = max([cluster.cal_e for cluster in self.clusters])
     for index, cluster in enumerate(self.clusters):
-      cluster.cal_e /= total_energy
+      cluster.cal_e /= max_energy
       for field in FIELDS_TO_NORMALIZE['clusters']:
         setattr(cluster, field, normalized_cluster_fields_values[index][FIELDS_TO_NORMALIZE['clusters'].index(field)])
     
     # normalize tracks
     normalizable_tracks_fields_values = np.array([[getattr(track, field) for track in self.tracks] for field in FIELDS_TO_NORMALIZE['tracks']]).T
     normalized_track_fields_values = self.tracks_scaler.fit_transform(normalizable_tracks_fields_values)
-    total_pt = sum([track.pt for track in self.tracks])
+    max_pt = max([track.pt for track in self.tracks])
     for index, track in enumerate(self.tracks):
-      track.pt /= total_pt
+      track.pt /= max_pt
       for field in FIELDS_TO_NORMALIZE['tracks']:
         setattr(track, field, normalized_track_fields_values[index][FIELDS_TO_NORMALIZE['tracks'].index(field)])
 

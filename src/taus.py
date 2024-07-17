@@ -15,7 +15,7 @@ MODELS = {
   'default': lambda: DoubelTauRegionDetection(RESOLUTION),
 }
 
-data_file = 'ggXtautau_mX20_run3year1'
+data_file = 'ggXtautau_mX20_run3year1_x2'
 
 if __name__ == '__main__':
   command = sys.argv[1]

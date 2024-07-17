@@ -1,6 +1,7 @@
 import numpy as np
 from progress.bar import IncrementalBar
 
+from settings import ETA_RANGE, PHI_RANGE
 from utils import datafile_path
 
 def proliferate (dataset, factor):
@@ -23,10 +24,11 @@ def proliferate (dataset, factor):
         copy['tracks']['Tracks.eta'] = -copy['tracks']['Tracks.eta']
         copy['truthTaus']['TruthTaus.eta_vis'] = -copy['truthTaus']['TruthTaus.eta_vis']
       # rotate phi by a random angle
-      random_angle = np.random.rand() * 2 * np.pi
-      copy['clusters']['Clusters.calPhi'] = (copy['clusters']['Clusters.calPhi'] + random_angle) % (2 * np.pi)
-      copy['tracks']['Tracks.phi'] = (copy['tracks']['Tracks.phi'] + random_angle) % (2 * np.pi)
-      copy['truthTaus']['TruthTaus.phi_vis'] = (copy['truthTaus']['TruthTaus.phi_vis'] + random_angle) % (2 * np.pi)
+      random_angle = np.random.rand() * (PHI_RANGE[1] - PHI_RANGE[0])
+        
+      copy['clusters']['Clusters.calPhi'] = rotate(copy['clusters']['Clusters.calPhi'], random_angle)
+      copy['tracks']['Tracks.phi'] = rotate(copy['tracks']['Tracks.phi'], random_angle)
+      copy['truthTaus']['TruthTaus.phi_vis'] = rotate(copy['truthTaus']['TruthTaus.phi_vis'], random_angle)
 
       add(copy)
     bar.next()
@@ -36,3 +38,10 @@ def proliferate (dataset, factor):
   dataset.save(datafile_path(dataset.source_file + '_x' + str(factor)))
   print(f'Saved to {datafile_path(dataset.source_file + "_x" + str(factor))}')
 
+def rotate(angle, by):
+  new_angle = (angle + by) % (PHI_RANGE[1] - PHI_RANGE[0])
+  if (new_angle > PHI_RANGE[1]):
+    new_angle -= PHI_RANGE[1] - PHI_RANGE[0]
+  if (new_angle < PHI_RANGE[0]):
+    new_angle += PHI_RANGE[1] - PHI_RANGE[0]
+  return new_angle

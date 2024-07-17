@@ -1,3 +1,6 @@
+from .event_visualizer import EventVisualizer
+from .dataset_visualizer import DatasetVisualizer
+
 import matplotlib.pyplot as plt
 import numpy as np
 

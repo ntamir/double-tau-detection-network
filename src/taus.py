@@ -9,22 +9,20 @@ from commands.train import train_module
 from commands.detect import detect
 from commands.proliferate import proliferate
 
-RESOLUTION = 100
+from settings import RESOLUTION, DATA_FILE
 
 MODELS = {
   'default': lambda: DoubelTauRegionDetection(RESOLUTION),
 }
 
-data_file = 'ggXtautau_mX20_run3year1_x2'
-
 if __name__ == '__main__':
   command = sys.argv[1]
-  dataset = EventsDataset(datafile_path(data_file), RESOLUTION)
+  dataset = EventsDataset(datafile_path(DATA_FILE), RESOLUTION)
 
   if command == 'show':
-    graph_name = sys.argv[2]
+    scope = sys.argv[2]
     params = sys.argv[3:]
-    show(dataset, graph_name, params)
+    show(dataset, scope, params)
     exit()
 
   if command == 'train':

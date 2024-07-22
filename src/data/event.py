@@ -52,7 +52,12 @@ class Event:
     return self._calculateion_cache[key]
 
   def normalization_factors (self):
-    return np.array([self.clusters_scaler.mean_, self.clusters_scaler.var_, self.tracks_scaler.mean_, self.tracks_scaler.var_]).flatten()
+    return {
+      'clusters_mean': self.clusters_scaler.mean_,
+      'clusters_std': self.clusters_scaler.var_,
+      'tracks_mean': self.tracks_scaler.mean_,
+      'tracks_std': self.tracks_scaler.var_,
+    }
 
   # input types
 

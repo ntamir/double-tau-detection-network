@@ -17,7 +17,7 @@ def show (dataset, scope, params):
   if scope not in commands:
     exit(f'Unknown scope: {scope}')
 
-  if commands[scope]['_test']:
+  if commands[scope].get('_test'):
     error = commands[scope]['_test'](dataset, params)
     if error:
       exit(error)

@@ -11,7 +11,7 @@ FIELDS_TO_NORMALIZE = {
 }
 
 class Event:
-  def __init__ (self, event, clusters, tracks, truth, cluster_fields, track_fields, truth_fields):
+  def __init__ (self, event, clusters, tracks, truth, event_fields, cluster_fields, track_fields, truth_fields):
     self.average_interactions_per_crossing = event[0]
     self.clusters = [Cluster(cluster, cluster_fields) for cluster in clusters if cluster['valid']]
     self.tracks = [Track(track, track_fields) for track in tracks if track['valid']]
@@ -53,10 +53,10 @@ class Event:
 
   def normalization_factors (self):
     return {
-      'clusters_mean': self.clusters_scaler.mean_,
-      'clusters_std': self.clusters_scaler.var_,
-      'tracks_mean': self.tracks_scaler.mean_,
-      'tracks_std': self.tracks_scaler.var_,
+      'clusters mean': self.clusters_scaler.mean_,
+      'clusters std': self.clusters_scaler.var_,
+      'tracks mean': self.tracks_scaler.mean_,
+      'tracks std': self.tracks_scaler.var_,
     }
 
   # input types

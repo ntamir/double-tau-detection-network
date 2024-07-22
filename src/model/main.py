@@ -2,11 +2,11 @@ import torch
 from torch import nn
 
 from model.cylinrical_conv import CylindricalConv2d
+from settings import RESOLUTION
 
-class DoubelTauRegionDetection (nn.Module):
-  def __init__(self, resolution=100, input_channels=10, dropout_probability=0.15):
-    super(DoubelTauRegionDetection, self).__init__()
-    self.resolution = resolution
+class MainModel (nn.Module):
+  def __init__(self, input_channels=10, dropout_probability=0.15):
+    super(MainModel, self).__init__()
     self.dropout_probability = dropout_probability
     self.input_channels = input_channels
 
@@ -28,7 +28,7 @@ class DoubelTauRegionDetection (nn.Module):
     ])
 
     self.linear_layers = nn.ModuleList([
-      nn.Linear(16 * (resolution // 20) * (resolution // 20), 64),
+      nn.Linear(16 * (RESOLUTION // 20) * (RESOLUTION // 20), 64),
       nn.PReLU(),
       nn.Dropout(self.dropout_probability),
       nn.Linear(64, 4)
@@ -44,10 +44,10 @@ class DoubelTauRegionDetection (nn.Module):
   def forward(self, x):
     for layer in self.conv_layers:
       x = layer(x)
-
-    x = x.view(-1, 16 * (self.resolution // 20) * (self.resolution // 20))
-
+    
+    x = x.view(-1, 16 * (RESOLUTION // 20) * (RESOLUTION // 20))
+    
     for layer in self.linear_layers:
       x = layer(x)
-
+    
     return x

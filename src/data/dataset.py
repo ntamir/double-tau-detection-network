@@ -5,24 +5,22 @@ import numpy as np
 
 from data.event import Event
 from utils import *
+from settings import RESOLUTION, DATASET_FIELDS
 
 class EventsDataset (Dataset):
-  def __init__(self, source_file, resolution=100):
+  def __init__(self, source_file):
     super().__init__()
-    self.load(source_file)
+    self.dataset_fields = DATASET_FIELDS
     self.cache = {}
-    self.resolution = resolution
+    self.load(source_file)
 
   def get_event(self, index):
     if index in self.cache:
       return self.cache[index]
-
-    event = self.raw_data['event'][index]
-    clusters = self.raw_data['clusters'][index]
-    tracks = self.raw_data['tracks'][index]
-    truth = self.raw_data['truthTaus'][index]
     
-    item = Event(event, clusters, tracks, truth, self._cluster_fields, self._track_fields, self._truth_fields)
+    fields = [self.raw_data[field][index] for field in self.dataset_fields]
+
+    item = Event(*fields, **self._fields)
     self.cache[index] = item
     return item
 
@@ -66,6 +64,4 @@ class EventsDataset (Dataset):
     self.source_file = source_file
     self.raw_data = h5py.File(source_file, 'r')
 
-    self._cluster_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['clusters'].dtype.names]
-    self._track_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['tracks'].dtype.names]
-    self._truth_fields = [(name, python_name_from_dtype_name(name)) for name in self.raw_data['truthTaus'].dtype.names]
+    self._fields = { f'{field}_fields': [(name, python_name_from_dtype_name(name)) for name in self.raw_data[field].dtype.names] for field in self.dataset_fields }

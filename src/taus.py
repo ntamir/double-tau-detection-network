@@ -2,7 +2,7 @@ import sys
 import time
 from data.dataset import EventsDataset
 from model.main import MainModel
-from utils import datafile_path, modelfile_path
+from utils import datafile_path, modelfolder_path
 
 from commands.show import show
 from commands.train import train_module
@@ -23,12 +23,12 @@ if __name__ == '__main__':
     exit()
 
   if command == 'train':
-    output = modelfile_path(sys.argv[3]) if len(sys.argv) > 3 else modelfile_path('model_' + str(round(time.time() * 1000)))
+    output = modelfolder_path(sys.argv[3]) if len(sys.argv) > 3 else modelfolder_path('model_' + str(round(time.time() * 1000)))
     train_module(dataset, module, output)
     exit()
 
   if command == 'detect':
-    model_file = modelfile_path(sys.argv[2])
+    model_file = modelfolder_path(sys.argv[2]) + '\\model.pth'
     params = sys.argv[4:]
     detect(dataset, module, model_file)
     exit()

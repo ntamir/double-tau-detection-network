@@ -11,11 +11,11 @@ FIELDS_TO_NORMALIZE = {
 }
 
 class Event:
-  def __init__ (self, event, clusters, tracks, truth, event_fields, cluster_fields, track_fields, truth_fields):
+  def __init__ (self, event, clusters, tracks, truth, event_fields, clusters_fields, tracks_fields, truthTaus_fields):
     self.average_interactions_per_crossing = event[0]
-    self.clusters = [Cluster(cluster, cluster_fields) for cluster in clusters if cluster['valid']]
-    self.tracks = [Track(track, track_fields) for track in tracks if track['valid']]
-    self.truths = [Truth(truth, truth_fields) for truth in truth if truth['valid']]
+    self.clusters = [Cluster(cluster, clusters_fields) for cluster in clusters if cluster['valid']]
+    self.tracks = [Track(track, tracks_fields) for track in tracks if track['valid']]
+    self.truths = [Truth(truth, truthTaus_fields) for truth in truth if truth['valid']]
 
     self.clusters = [cluster for cluster in self.clusters if cluster.position().in_range()]
     self.tracks = [track for track in self.tracks if track.position().in_range()]

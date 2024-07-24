@@ -43,10 +43,13 @@ class EventsDataset (Dataset):
       lambda track: track.q_over_p
     ]
 
-    clusters_map = event.clusters_map(self.resolution, cluster_channel_providers)
-    tracks_map = event.tracks_map(self.resolution, track_channel_providers)
+    clusters_map = event.clusters_map(RESOLUTION, cluster_channel_providers)
+    tracks_map = event.tracks_map(RESOLUTION, track_channel_providers)
     inputs = (np.concatenate([clusters_map, tracks_map], axis=0),)
-    target = np.array(event.true_position()).flatten()[:4]
+    target = np.array([position.to_list() for position in event.true_position()], dtype=np.float32).flatten()[:4]
+    
+    if len(target) < 4:
+      target = np.concatenate([target, np.zeros(4 - len(target), dtype=np.float32)])
 
     return inputs, target
 

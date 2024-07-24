@@ -29,24 +29,27 @@ def print_map (map):
 def long_operation (operation, **kwargs):
   bar = IncrementalBar(**kwargs)
   start = time()
-  def next ():
-    bar.next()
+  def next (step=1):
+    bar.next(step)
     percentage = bar.index / bar.max
     elapsed = time() - start
     if elapsed > 5:
       remaining = (1 - percentage) * elapsed / percentage
-      hours, minutes, seconds = int(remaining // 3600), int(remaining // 60) % 60, int(remaining) % 60
-      bar.suffix = f'{bar.index}/{bar.max} [{percentage * 100:.1f}%%] {hours:02}:{minutes:02}:{seconds:02}'
+      bar.suffix = f'{bar.index}/{bar.max} [{percentage * 100:.1f}%%] {seconds_to_time(remaining)}'
     else:
       bar.suffix = f'{bar.index}/{bar.max} [{percentage * 100:.1f}%%]'
   result = operation(next)
   bar.finish()
   return result
 
+def seconds_to_time (seconds):
+  hours, minutes, seconds = int(seconds // 3600), int(seconds // 60) % 60, int(seconds) % 60
+  return f'{hours:02}:{minutes:02}:{seconds:02}' if hours > 0 else f'{minutes:02}:{seconds:02}'
+
 def datafile_path (name):
   # go to parent directory of this file, then go to the data directory and add h5 suffix
   return os.path.join(os.path.dirname(os.path.dirname(__file__)), DATA_DIR, name + '.h5')
 
-def modelfile_path (name):
+def modelfolder_path (name):
   # go to parent directory of this file, then go to the models directory and add pth suffix
-  return os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', name + '.pth')
+  return os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', name)

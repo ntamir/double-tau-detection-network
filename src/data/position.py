@@ -15,6 +15,9 @@ class Position (Iterable):
     rel_pos = self.relative()
     return rel_pos[0] >= 0 and rel_pos[0] <= 1 and rel_pos[1] >= 0 and rel_pos[1] <= 1
   
+  def to_list (self):
+    return np.array([self.eta, self.phi], dtype=np.float32)
+  
   def __iter__ (self):
     return iter([self.eta, self.phi])
   

@@ -23,7 +23,7 @@ if __name__ == '__main__':
     exit()
 
   if command == 'train':
-    output = modelfolder_path(sys.argv[3]) if len(sys.argv) > 3 else modelfolder_path('model_' + str(round(time.time() * 1000)))
+    output = modelfolder_path(sys.argv[2]) if len(sys.argv) > 2 else modelfolder_path('model_' + str(round(time.time() * 1000)))
     train_module(dataset, module, output)
     exit()
 

@@ -14,6 +14,15 @@ class DatasetVisualizer:
       [print(python_name) for _, python_name in self.dataset._fields[f'{field}_fields']]
       print()
 
+  def show_proliferation (self, flips, rotations):
+    fig, axes = plt.subplots(1, 2)
+    non_flips = len(self.dataset) - flips
+    axes[0].pie([flips, non_flips], labels=[f'{flips} events eta flipped', f'{non_flips} events eta not flipped'], autopct='%1.1f%%')
+    axes[0].set_title('Flips')
+    axes[1].hist(rotations, bins=HISTOGRAM_BINS, edgecolor='black')
+    axes[1].set_title('Phi Rotations')
+    plt.show()
+
   def histogram (self, config):
     fields = config['fields']
     callback = config['callback']

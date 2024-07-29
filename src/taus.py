@@ -14,13 +14,14 @@ from settings import DATA_FILE
 if __name__ == '__main__':
   command = sys.argv[1]
   dataset = EventsDataset(datafile_path(DATA_FILE))
-  module = MainModel()
 
   if command == 'show':
     scope = sys.argv[2]
     params = sys.argv[3:]
     show(dataset, scope, params)
     exit()
+
+  module = MainModel()
 
   if command == 'train':
     output = modelfolder_path(sys.argv[2]) if len(sys.argv) > 2 else modelfolder_path('model_' + str(round(time.time() * 1000)))

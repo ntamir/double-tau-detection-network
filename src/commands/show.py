@@ -7,9 +7,10 @@ commands = {
     'fields': lambda visualizer, _params: visualizer.print_fields()
   },
   'event': {
-    '_test': lambda dataset, params: 'Event not in dataset' if int(params[0]) < len(dataset) else None,
-    '_visualizer': lambda dataset, params: EventVisualizer(dataset.get_event(int(params[0]))),
-    'map': lambda visualizer, _params: visualizer.map(),
+    '_test': lambda dataset, params: 'Event not in dataset' if int(params[1]) > len(dataset) else None,
+    '_visualizer': lambda dataset, params: EventVisualizer(dataset.get_event(int(params[1]))),
+    'density_map': lambda visualizer, _params: visualizer.density_map(),
+    'momentum_map': lambda visualizer, _params: visualizer.momentum_map()
   }
 }
 

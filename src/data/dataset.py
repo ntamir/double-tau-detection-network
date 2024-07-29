@@ -50,6 +50,10 @@ class EventsDataset (Dataset):
     
     if len(target) < 4:
       target = np.concatenate([target, np.zeros(4 - len(target), dtype=np.float32)])
+    
+    # if target is all zeros, it means that there is no tau in the event, throw error
+    if np.all(target == 0):
+      raise ValueError('No tau in the event #{}'.format(index))
 
     return inputs, target
 

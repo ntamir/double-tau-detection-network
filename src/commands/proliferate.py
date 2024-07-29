@@ -47,10 +47,10 @@ def proliferate (dataset, factor):
   DatasetVisualizer(dataset).show_proliferation(flips, rotations)
 
 def rotate(angles, by):
-  new_angles = (angles + by) % (PHI_RANGE[1] - PHI_RANGE[0])
+  new_angles = (angles + by) % (PHI_RANGE[1] - PHI_RANGE[0]) + PHI_RANGE[0]
   for new_angle in new_angles:
-    if (new_angle > PHI_RANGE[1]):
+    while (new_angle > PHI_RANGE[1]):
       new_angle -= PHI_RANGE[1] - PHI_RANGE[0]
-    if (new_angle < PHI_RANGE[0]):
+    while (new_angle < PHI_RANGE[0]):
       new_angle += PHI_RANGE[1] - PHI_RANGE[0]
   return new_angles

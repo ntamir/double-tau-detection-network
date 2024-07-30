@@ -11,7 +11,7 @@ from utils import long_operation, seconds_to_time
 from visualization import ModelVisualizer
 from settings import EPOCHS, BATCH_SIZE, TRAINING_PERCENTAGE, VALIDATION_PERCENTAGE, TEST_ARROWS_PERCENTAGE
 
-def train_module(dataset, model, output_folder):
+def train_module(dataset, model, output_folder, options={}):
   start_time = time.time()
   train_loader, validation_loader, test_loader = init_dataloaders(dataset)
   print(f'training over {len(train_loader.dataset)} samples, validating over {len(validation_loader.dataset)} samples, testing over {len(test_loader.dataset)} samples')
@@ -20,6 +20,9 @@ def train_module(dataset, model, output_folder):
     print(f'using device {torch.cuda.get_device_name(0)}')
   else:
     print('using device cpu')
+
+  if options.get('cache') == 'false':
+    dataset.use_cache = False
 
   optimizer = Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
   criterion = nn.MSELoss()

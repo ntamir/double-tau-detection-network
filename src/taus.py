@@ -25,7 +25,8 @@ if __name__ == '__main__':
 
   if command == 'train':
     output = modelfolder_path(sys.argv[2]) if len(sys.argv) > 2 else modelfolder_path('model_' + str(round(time.time() * 1000)))
-    train_module(dataset, module, output)
+    options = { key: value for key, value in [variable.split('=') for variable in sys.argv[3:]] }
+    train_module(dataset, module, output, options)
     exit()
 
   if command == 'detect':

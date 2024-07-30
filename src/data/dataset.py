@@ -11,17 +11,19 @@ class EventsDataset (Dataset):
   def __init__(self, source_file):
     super().__init__()
     self.dataset_fields = DATASET_FIELDS
+    self.use_cache = True
     self.cache = {}
     self.load(source_file)
 
   def get_event(self, index):
-    if index in self.cache:
+    if self.use_cache and index in self.cache:
       return self.cache[index]
     
     fields = [self.raw_data[field][index] for field in self.dataset_fields]
 
     item = Event(*fields, **self._fields)
-    self.cache[index] = item
+    if self.use_cache:
+      self.cache[index] = item
     return item
 
   def __getitem__(self, index):

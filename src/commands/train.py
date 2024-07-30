@@ -15,6 +15,9 @@ def train_module(dataset, model, output_folder):
   start_time = time.time()
   train_loader, validation_loader, test_loader = init_dataloaders(dataset)
   print(f'training over {len(train_loader.dataset)} samples, validating over {len(validation_loader.dataset)} samples, testing over {len(test_loader.dataset)} samples')
+  if torch.cuda.is_available():
+    model = model.cuda()
+    print(f'using device {torch.cuda.get_device_name(0)}')
 
   optimizer = Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
   criterion = nn.MSELoss()

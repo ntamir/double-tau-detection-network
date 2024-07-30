@@ -23,6 +23,7 @@ def train_module(dataset, model, output_folder, options={}):
 
   if options.get('cache') == 'false':
     dataset.use_cache = False
+    print(' -- cache disabled')
 
   optimizer = Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
   criterion = nn.MSELoss()

@@ -18,6 +18,8 @@ def train_module(dataset, model, output_folder):
   if torch.cuda.is_available():
     model = model.cuda()
     print(f'using device {torch.cuda.get_device_name(0)}')
+  else:
+    print('using device cpu')
 
   optimizer = Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
   criterion = nn.MSELoss()

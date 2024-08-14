@@ -15,10 +15,10 @@ MODELS_DIR = 'models'
 # Data
 RESOLUTION = 100
 DATASET_FIELDS = ['event', 'clusters', 'tracks', 'truthTaus']
-DATA_FILE = 'ggXtautau_mX20_run3year1_x3'
+DATA_FILE = 'ggXtautau_mX20_run3year1'
 
 # TRAINING
-EPOCHS = 50
+EPOCHS = 10
 BATCH_SIZE = 256
 
 TRAINING_PERCENTAGE = 0.7

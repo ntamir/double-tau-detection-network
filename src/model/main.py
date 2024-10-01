@@ -3,6 +3,7 @@ from torch import nn
 from dropblock import DropBlock2D
 
 from model.cylinrical_conv import CylindricalConv2d
+from model.attention import AttentionLayer
 from settings import RESOLUTION
 
 class MainModel (nn.Module):
@@ -39,6 +40,7 @@ class MainModel (nn.Module):
       nn.AvgPool2d(kernel_size=2, stride=2, padding=1),
       conv_block(512, 1024, kernel_size=3, padding=1, stride=1, bias=False),
       conv_block(1024, 1024, kernel_size=3, padding=1, stride=1, bias=False),
+      AttentionLayer(),
     ])
 
     self.linear_layers = nn.ModuleList([

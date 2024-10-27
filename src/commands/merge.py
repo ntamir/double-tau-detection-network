@@ -44,8 +44,10 @@ def append_to_output_file (output_file, input_file):
       output['truthTaus'][-truthTaus.shape[0]:] = truthTaus
 
 def merge_h5_files(input_files, output_file):
+  print(f'Creating {output_file} from {input_files[0]}')
   create_output_file(output_file, input_files[0])
   for input_file in input_files[1:]:
+    print(f'Appending {input_file} to {output_file}')
     append_to_output_file(output_file, input_file)
 
 if __name__ == '__main__':

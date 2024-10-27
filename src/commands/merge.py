@@ -4,10 +4,18 @@ import h5py
 
 def create_output_file (output_file, input_file):
   with h5py.File(input_file, 'r') as input:
+    event = input['event'][:]
     tracks = input['tracks'][:]
     cells = input['clusters'][:]
     truthTaus = input['truthTaus'][:]
     with h5py.File(output_file, 'w') as output:
+      output.create_dataset(
+        "event",
+        data=event,
+        compression="gzip",
+        chunks=True,
+        maxshape=(None,),
+      )
       output.create_dataset(
         "tracks",
         data=tracks,
@@ -32,10 +40,13 @@ def create_output_file (output_file, input_file):
 
 def append_to_output_file (output_file, input_file):
   with h5py.File(input_file, 'r') as input:
+    event = input['event'][:]
     tracks = input['tracks'][:]
     cells = input['clusters'][:]
     truthTaus = input['truthTaus'][:]
     with h5py.File(output_file, 'a') as output:
+      output['event'].resize((output['event'].shape[0] + event.shape[0]), axis=0)
+      output['event'][-event.shape[0]:] = event
       output['tracks'].resize((output['tracks'].shape[0] + tracks.shape[0]), axis=0)
       output['tracks'][-tracks.shape[0]:] = tracks
       output['clusters'].resize((output['clusters'].shape[0] + cells.shape[0]), axis=0)

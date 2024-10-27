@@ -24,7 +24,7 @@ def proliferate (dataset, factor):
       next()
     
     with ThreadPoolExecutor() as executor:
-      events = [executor.submit(build_event_dict, value, index) for index, value in enumerate(values)]
+      [executor.submit(build_event_dict, value, index) for index, value in enumerate(values)]
       executor.shutdown(wait=True)
     return events
   original_events = long_operation(load_events, max=len(dataset), message='Loading events')

@@ -78,7 +78,6 @@ def run_with_next (operation, next):
   return future
 
 def transform_chunk (indices, factor, dataset_length, source_file, sourcce_file_access_lock, keys, flips, rotations):
-  print(f'Starting chunk {indices[0]}-{indices[-1]}', flush=True)
   flips = extended_list_from_indices(flips, factor, dataset_length, indices)
   rotations = extended_list_from_indices(rotations, factor, dataset_length, indices)
   result = { key: [None] * len(indices) * (factor - 1) for key in keys }
@@ -87,7 +86,6 @@ def transform_chunk (indices, factor, dataset_length, source_file, sourcce_file_
       copy = transform(data_index, source_file, sourcce_file_access_lock, keys, flips[lists_index * (factor - 1) + copy_index], rotations[lists_index * (factor - 1) + copy_index])
       for key in keys:
         result[key][lists_index * (factor - 1) + copy_index] = copy[key]
-  print(f'Finished chunk {indices[0]}-{indices[-1]}', flush=True)
   return result
 
 def extended_list_from_indices (list, factor, dataset_length, indices):

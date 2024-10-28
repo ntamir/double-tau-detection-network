@@ -26,11 +26,11 @@ def proliferate (dataset, factor):
       else:
         print(f'Creating dataset for {key}')
         dataset_creation_start_time = time.time()
-        output.create_dataset(key, data=dataset.raw_data[key], compression='gzip', chunks=True, maxshape=(None, *dataset.raw_data[key].shape[1:]))
+        output.create_dataset(key, data=dataset.raw_data[key][:], compression='gzip', chunks=True, maxshape=(None, *dataset.raw_data[key].shape[1:]))
         output[key].resize((output[key].shape[0] * factor), axis=0)
         print(f'Created dataset for {key} in {seconds_to_time(time.time() - dataset_creation_start_time)}')
-    output_file_time = time.time()
     output.flush()
+    output_file_time = time.time()
     print(f'Initialized output file in {seconds_to_time(output_file_time - start)}')
 
     chunk_size = 1000

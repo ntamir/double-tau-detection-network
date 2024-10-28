@@ -55,7 +55,7 @@ def proliferate (dataset, factor):
       return [future.result() for future in as_completed(futures)]
     
   print('Generating copies')
-  copy_chunks = create_copies(lambda _: None)
+  copy_chunks = long_operation(create_copies, multiprocessing=True, max=len(chunks))
 
   def add_copies (next):
     with h5py.File(output_file, 'a') as output:
@@ -65,7 +65,7 @@ def proliferate (dataset, factor):
           output[key][start_index:start_index + chunk_size * (factor - 1)] = chunk[key]
 
   print('Saving copies')
-  add_copies(lambda _: None)
+  long_operation(add_copies, multiprocessing=False, max=len(copy_chunks))
 
   print()
   print(f'Done in {seconds_to_time(time.time() - start)}')

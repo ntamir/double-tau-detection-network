@@ -60,7 +60,7 @@ def proliferate (dataset, factor):
             start_index = len(dataset) + copy_cunk_index * chunk_size * (factor - 1)
             output[key][start_index:start_index + chunk_size * (factor - 1)] = copy_chunk[key]
 
-    long_operation(run, max=len(dataset), message=f'Proliferating', multiprocessing=True)
+    long_operation(run, max=len(chunks), message=f'Proliferating', multiprocessing=True)
     print(f'Generated copies in {seconds_to_time(time.time() - copy_start_time)}')
 
   print()

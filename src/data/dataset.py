@@ -37,9 +37,13 @@ class EventsDataset (Dataset):
       start = time()
       arr = self.raw_data[field]
       arr_time = time()
-      fields.append(arr[index])
+      item = arr[index]
       index_time = time()
-      print(f'arr_time: {arr_time - start}, index_time: {index_time - arr_time}')
+      fields.append(item)
+      append_time = time()
+      print(f'arr_time: {arr_time - start}, index_time: {index_time - arr_time}, append_time: {append_time - index_time}')
+    
+    # fields = [self.raw_data[field][index] for field in self.dataset_fields]
 
     item = Event(*fields, **self._fields)
     if self.use_cache:

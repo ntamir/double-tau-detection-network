@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
   from settings import DATA_FILE
   params = { key: value for key, value in [variable.split('=') for variable in sys.argv[2:]] }
-  dataset_file = datafile_path(params.get('src', DATA_FILE))
+  dataset_file = params.get('ext-src', datafile_path(params.get('src', DATA_FILE)))
 
   if command == 'proliferate':
     factor = int(params.get('factor', 10))

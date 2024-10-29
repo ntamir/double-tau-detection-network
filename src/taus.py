@@ -29,7 +29,15 @@ if __name__ == '__main__':
     exit()
 
   if command == 'merge':
-    input_files = [datafile_path(file) for file in params.get('src', '').split(',')]
+    src = params.get('src', '')
+    ext_src = params.get('ext-src', '')
+    if src:
+      input_files = [datafile_path(file) for file in params.get('src', '').split(',')]
+    elif ext_src:
+      input_files = [file for file in params.get('ext-src', '').split(',')]
+    else:
+      print('No input files specified')
+      exit()
     output_file = datafile_path(params.get('output', 'merge_' + str(round(time.time() * 1000))))
 
     merge(input_files, output_file)

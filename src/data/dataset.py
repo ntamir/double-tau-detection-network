@@ -33,7 +33,7 @@ class EventsDataset (Dataset):
     if self.use_cache and index in self.cache:
       return self.cache[index]
     
-    fields = [self.raw_data[field][index] for field in self.dataset_fields]
+    fields = [(self.data if self.preloaded else self.raw_data)[field][index] for field in self.dataset_fields]
 
     item = Event(*fields, **self._fields)
     if self.use_cache:

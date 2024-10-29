@@ -125,7 +125,7 @@ def preload (loader):
   dataset = loader.dataset
   def run (next):
     for index in range(len(dataset)):
-      dataset.get_event(index)
+      dataset[index]
       next(1)
   long_operation(run, max=len(dataset), message='Preloading')
 

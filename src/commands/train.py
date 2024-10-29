@@ -29,7 +29,7 @@ def train_module(dataset, model, output_folder, options={}):
   use_cuda = torch.cuda.is_available()
   if use_cuda:
     # init multiprocessing
-    torch.multiprocessing.set_start_method('spawn')
+    #torch.multiprocessing.set_start_method('spawn')
     model = model.cuda()
     print(f'Using Device:                     {torch.cuda.get_device_name(0)}')
   else:
@@ -124,7 +124,7 @@ def generate_dataloader (dataset, device, options):
   num_workers = int(options.get('num_workers', 0))
   pin_memory = num_workers > 0
   batch_size = int(options.get('batch_size', BATCH_SIZE))
-  return DataLoader(dataset, batch_size=batch_size, shuffle=True, collate_fn=lambda x: tuple(x_.to(device) for x_ in default_collate(x)), num_workers=num_workers, pin_memory=pin_memory)
+  return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
 
 def preload (loader):
   dataset = loader.dataset

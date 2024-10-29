@@ -7,6 +7,7 @@ from torch.optim import Adam
 from torch.utils.data import random_split
 from torch.utils.data.dataloader import default_collate
 import numpy as np
+from tqdm import tqdm
 
 from utils import long_operation, seconds_to_time
 from visualization import ModelVisualizer
@@ -128,11 +129,13 @@ def generate_dataloader (dataset, device, options):
 
 def preload (loader):
   dataset = loader.dataset
-  def run (next):
-    for index in range(len(dataset)):
-      dataset[index]
-      next(1)
-  long_operation(run, max=len(dataset), message='Preloading')
+  for index in tqdm(range(len(dataset))):
+    dataset[index]
+  # def run (next):
+  #   for index in range(len(dataset)):
+  #     dataset[index]
+  #     next(1)
+  # long_operation(run, max=len(dataset), message='Preloading')
 
 # train the model
 def train(train_loader, model, criterion, optimizer, epoch):

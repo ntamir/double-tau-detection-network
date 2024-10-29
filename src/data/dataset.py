@@ -32,17 +32,24 @@ class EventsDataset (Dataset):
     if self.use_cache and index in self.cache:
       return self.cache[index]
     
+    start = time()
+
     fields = [self.raw_data[field][index] for field in self.dataset_fields]
+
+    io = time()
 
     item = Event(*fields, **self._fields)
     if self.use_cache:
       self.cache[index] = item
+
+    calc = time()
+
+    print(f'Index {index} loaded in {calc - start:.2f}s (io: {io - start:.2f}s, calc: {calc - io:.2f}s)')
+    
     return item
 
   def __getitem__(self, index):
-    start = time()
     event = self.get_event(index)
-    event_time = time()
 
     clusters_map = event.clusters_map(RESOLUTION, self.cluster_channel_providers)
     tracks_map = event.tracks_map(RESOLUTION, self.track_channel_providers)
@@ -60,10 +67,6 @@ class EventsDataset (Dataset):
     input = torch.tensor(input, dtype=torch.float32)
     target = torch.tensor(target, dtype=torch.float32)
 
-    calculation_time = time()
-
-    print(f'Event {index} loaded in {event_time - start:.2f}s, calculated in {calculation_time - event_time:.2f}s')
-    
     return input, target
 
   def __len__(self):

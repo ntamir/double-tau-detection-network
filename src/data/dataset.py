@@ -4,7 +4,7 @@ import torch
 import numpy as np
 import gc
 import math
-import time
+from time import time
 
 from data.event import Event
 from utils import *
@@ -40,9 +40,9 @@ class EventsDataset (Dataset):
     return item
 
   def __getitem__(self, index):
-    start = time.time()
+    start = time()
     event = self.get_event(index)
-    event_time = time.time()
+    event_time = time()
 
     clusters_map = event.clusters_map(RESOLUTION, self.cluster_channel_providers)
     tracks_map = event.tracks_map(RESOLUTION, self.track_channel_providers)
@@ -60,7 +60,7 @@ class EventsDataset (Dataset):
     input = torch.tensor(input, dtype=torch.float32)
     target = torch.tensor(target, dtype=torch.float32)
 
-    calculation_time = time.time()
+    calculation_time = time()
 
     print(f'Event {index} loaded in {event_time - start:.2f}s, calculated in {calculation_time - event_time:.2f}s')
     

@@ -36,7 +36,7 @@ def train_module(dataset, model, output_folder, options={}):
     print('Using Device:                     cpu')
 
   device = torch.device('cuda' if use_cuda else 'cpu')
-  train_loaders, validation_loaders, test_loader = init_dataloaders(dataset, device, split, options)
+  train_loaders, validation_loaders, test_loader = init_dataloaders(dataset, torch.device('cpu'), split, options)
   
   using_multiprocessing = int(options.get('num_workers', 0)) > 0
   print(f'training set size:                {sum([len(loader.dataset) for loader in train_loaders])}')

@@ -15,7 +15,7 @@ def create_output_file (output_file, input_file):
         "event",
         data=event,
         compression="gzip",
-        chunks=(1, event.shape[0]),
+        chunks=(1,),
         maxshape=(None,),
       )
       output.create_dataset(

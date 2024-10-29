@@ -35,7 +35,7 @@ class EventsDataset (Dataset):
     fields = []
     for field in self.dataset_fields:
       start = time()
-      arr = self.raw_data[field]
+      arr = self.data[field]
       arr_time = time()
       item = arr[index]
       index_time = time()
@@ -72,7 +72,7 @@ class EventsDataset (Dataset):
     return input, target
 
   def __len__(self):
-    return len(self.raw_data['event'])
+    return len(self.data['event'])
   
   def __iter__(self):
     worker_info = torch.utils.data.get_worker_info()
@@ -106,5 +106,10 @@ class EventsDataset (Dataset):
   def load(self, source_file):
     self.source_file = source_file
     self.raw_data = h5py.File(source_file, 'r')
+
+    # load all events
+    print('Loading data...')
+    self.data = { field: self.raw_data[field][:] for field in self.dataset_fields }
+    print('Data loaded')
 
     self._fields = { f'{field}_fields': [(name, python_name_from_dtype_name(name)) for name in self.raw_data[field].dtype.names] for field in self.dataset_fields }

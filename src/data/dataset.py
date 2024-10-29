@@ -109,7 +109,10 @@ class EventsDataset (Dataset):
 
     # load all events
     print('Loading data...')
-    self.data = { field: self.raw_data[field][:] for field in self.dataset_fields }
+    self.data = {}
+    for field in self.dataset_fields:
+      print(f'Loading {field}')
+      self.data[field] = self.raw_data[field][:]
     print('Data loaded')
 
     self._fields = { f'{field}_fields': [(name, python_name_from_dtype_name(name)) for name in self.raw_data[field].dtype.names] for field in self.dataset_fields }

@@ -33,11 +33,14 @@ class EventsDataset (Dataset):
     if self.use_cache and index in self.cache:
       return self.cache[index]
     
+    start = time()
     fields = [(self.data if self.preloaded else self.raw_data)[field][index] for field in self.dataset_fields]
-
+    load_time = time()
     item = Event(*fields, **self._fields)
+    item_time = time()
     if self.use_cache:
       self.cache[index] = item
+    print(f'Load time: {load_time - start}, Item time: {item_time - load_time}')
     return item
 
   def __getitem__(self, index):

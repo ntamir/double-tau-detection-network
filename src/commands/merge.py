@@ -2,6 +2,8 @@
 
 import h5py
 
+from utils import long_operation, datafile_path
+
 def create_output_file (output_file, input_file):
   with h5py.File(input_file, 'r') as input:
     event = input['event'][:]
@@ -54,22 +56,15 @@ def append_to_output_file (output_file, input_file):
       output['truthTaus'].resize((output['truthTaus'].shape[0] + truthTaus.shape[0]), axis=0)
       output['truthTaus'][-truthTaus.shape[0]:] = truthTaus
 
-def merge_h5_files(input_files, output_file):
-  print(f'Creating {output_file} from {input_files[0]}')
-  create_output_file(output_file, input_files[0])
-  for input_file in input_files[1:]:
-    print(f'Appending {input_file} to {output_file}')
-    append_to_output_file(output_file, input_file)
+def merge (input_files, output_file):
+  print(f'Merging {len(input_files)} into {output_file}')
+  
+  def merge_h5_files(next):
+    create_output_file(output_file, input_files[0])
+    next()
+    for input_file in input_files[1:]:
+      append_to_output_file(output_file, input_file)
+      next()
 
-if __name__ == '__main__':
-  input_files = [
-    'mx20.h5',
-    'mx30.h5',
-    'mx40.h5',
-    'mx50.h5',
-    'mx60.h5'
-  ]
-  output_file = 'merged.h5'
-  print(f'Merging {len(input_files)} files into {output_file}')
-  merge_h5_files(input_files, output_file)
-  print('Done')
+  long_operation(merge_h5_files, max=len(input_files))
+  print('Merging complete')

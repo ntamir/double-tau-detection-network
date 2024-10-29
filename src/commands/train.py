@@ -7,7 +7,6 @@ from torch.optim import Adam
 from torch.utils.data import random_split
 from torch.utils.data.dataloader import default_collate
 import numpy as np
-from tqdm import tqdm
 
 from utils import long_operation, seconds_to_time
 from visualization import ModelVisualizer
@@ -30,14 +29,14 @@ def train_module(dataset, model, output_folder, options={}):
   use_cuda = torch.cuda.is_available()
   if use_cuda:
     # init multiprocessing
-    #torch.multiprocessing.set_start_method('spawn')
+    torch.multiprocessing.set_start_method('spawn')
     model = model.cuda()
     print(f'Using Device:                     {torch.cuda.get_device_name(0)}')
   else:
     print('Using Device:                     cpu')
 
   device = torch.device('cuda' if use_cuda else 'cpu')
-  train_loaders, validation_loaders, test_loader = init_dataloaders(dataset, torch.device('cpu'), split, options)
+  train_loaders, validation_loaders, test_loader = init_dataloaders(dataset, device, split, options)
   
   using_multiprocessing = int(options.get('num_workers', 0)) > 0
   print(f'training set size:                {sum([len(loader.dataset) for loader in train_loaders])}')
@@ -125,17 +124,15 @@ def generate_dataloader (dataset, device, options):
   num_workers = int(options.get('num_workers', 0))
   pin_memory = num_workers > 0
   batch_size = int(options.get('batch_size', BATCH_SIZE))
-  return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory)
+  return DataLoader(dataset, batch_size=batch_size, shuffle=True, collate_fn=lambda x: tuple(x_.to(device) for x_ in default_collate(x)), num_workers=num_workers, pin_memory=pin_memory)
 
 def preload (loader):
   dataset = loader.dataset
-  for index in tqdm(range(len(dataset))):
-    dataset[index]
-  # def run (next):
-  #   for index in range(len(dataset)):
-  #     dataset[index]
-  #     next(1)
-  # long_operation(run, max=len(dataset), message='Preloading')
+  def run (next):
+    for index in range(len(dataset)):
+      dataset[index]
+      next(1)
+  long_operation(run, max=len(dataset), message='Preloading')
 
 # train the model
 def train(train_loader, model, criterion, optimizer, epoch):

@@ -16,6 +16,7 @@ class EventsDataset (Dataset):
     self.dataset_fields = DATASET_FIELDS
     self.use_cache = True
     self.cache = {}
+    self.preloaded = False
     self.load(source_file)
 
     self.cluster_channel_providers = [
@@ -32,18 +33,7 @@ class EventsDataset (Dataset):
     if self.use_cache and index in self.cache:
       return self.cache[index]
     
-    fields = []
-    for field in self.dataset_fields:
-      start = time()
-      arr = self.data[field]
-      arr_time = time()
-      item = arr[index]
-      index_time = time()
-      fields.append(item)
-      append_time = time()
-      print(f'arr_time: {arr_time - start}, index_time: {index_time - arr_time}, append_time: {append_time - index_time}')
-    
-    # fields = [self.raw_data[field][index] for field in self.dataset_fields]
+    fields = [self.raw_data[field][index] for field in self.dataset_fields]
 
     item = Event(*fields, **self._fields)
     if self.use_cache:
@@ -72,7 +62,7 @@ class EventsDataset (Dataset):
     return input, target
 
   def __len__(self):
-    return len(self.data['event'])
+    return len(self.data['event']) if self.preloaded else len(self.raw_data['event'])
   
   def __iter__(self):
     worker_info = torch.utils.data.get_worker_info()
@@ -107,12 +97,15 @@ class EventsDataset (Dataset):
     self.source_file = source_file
     self.raw_data = h5py.File(source_file, 'r')
 
-    # load all events
-    print('Loading data...')
-    self.data = {}
-    for field in self.dataset_fields:
-      print(f'Loading {field}')
-      self.data[field] = self.raw_data[field][:]
-    print('Data loaded')
-
     self._fields = { f'{field}_fields': [(name, python_name_from_dtype_name(name)) for name in self.raw_data[field].dtype.names] for field in self.dataset_fields }
+
+  def full_preload (self):
+    self.preloaded = True
+    self.data = {}
+    def preload (next):
+      for field in self.dataset_fields:
+        self.data[field] = self.raw_data[field][:]
+        next()
+    long_operation(preload, max=len(self.dataset_fields), message='Preloading')
+
+    breakpoint()

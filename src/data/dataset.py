@@ -41,7 +41,7 @@ class EventsDataset (Dataset):
     if self.use_cache:
       self.cache[index] = item
     cache_time = time()
-    print(f'Load: {load_time - start:.4f}s, Item: {item_time - load_time:.4f}s, Cache: {cache_time - item_time:.4f}s')
+    #print(f'Load: {load_time - start:.4f}s, Item: {item_time - load_time:.4f}s, Cache: {cache_time - item_time:.4f}s')
     return item
 
   def __getitem__(self, index):

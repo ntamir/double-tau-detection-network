@@ -107,5 +107,3 @@ class EventsDataset (Dataset):
         self.data[field] = self.raw_data[field][:]
         next()
     long_operation(preload, max=len(self.dataset_fields), message='Preloading')
-
-    breakpoint()

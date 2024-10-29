@@ -32,10 +32,6 @@ if __name__ == '__main__':
     input_files = [datafile_path(file) for file in params.get('src', '').split(',')]
     output_file = datafile_path(params.get('output', 'merge_' + str(round(time.time() * 1000))))
 
-    if len(input_files) < 2:
-      print('At least two input files are required for merging')
-      exit()
-
     merge(input_files, output_file)
     exit()
   

@@ -32,20 +32,18 @@ class EventsDataset (Dataset):
     if self.use_cache and index in self.cache:
       return self.cache[index]
     
-    start = time()
-
-    fields = [self.raw_data[field][index] for field in self.dataset_fields]
-
-    io = time()
+    fields = []
+    for field in self.dataset_fields:
+      start = time()
+      arr = self.raw_data[field]
+      arr_time = time()
+      fields.append(arr[index])
+      index_time = time()
+      print(f'arr_time: {arr_time - start}, index_time: {index_time - arr_time}')
 
     item = Event(*fields, **self._fields)
     if self.use_cache:
       self.cache[index] = item
-
-    calc = time()
-
-    print(f'Index {index} loaded in {calc - start:.2f}s (io: {io - start:.2f}s, calc: {calc - io:.2f}s)')
-    
     return item
 
   def __getitem__(self, index):

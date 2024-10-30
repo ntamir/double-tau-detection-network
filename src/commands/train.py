@@ -66,10 +66,11 @@ def train_module(dataset, model, output_folder, options={}):
     if not full_preload:
       preload(train_loader)
       preload(validation_loader)
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
       epoch_start_times.append(time.time())
       training_loss = train(train_loader, model, criterion, optimizer, epoch)
       validation_loss = validate(validation_loader, model, criterion, epoch)
+      print("Training Loss: {:.6f}, Validation Loss: {:.6f}".format(training_loss, validation_loss))
       if validation_loss < best_validation_loss:
         best_validation_loss = validation_loss
         best_model = model.state_dict()

@@ -17,7 +17,7 @@ def create_output_file (output_file, input_file):
     not_two_truthtaus = np.unique(np.where(num_truthtaus != 2)[0])
     not_two_barrel_Taus = np.unique(np.where(np.abs(truthTaus_expanded[:, :2, 1]) > 2.5)[0])
     invalid_indices = np.unique(np.concatenate((not_two_truthtaus, not_two_barrel_Taus)))
-    print("Found", len(invalid_indices),"("+100*len(invalid_indices)/truthTaus.shape[0]+"%) invalid events, dropping...")
+    print("Found", len(invalid_indices),"("+str(100*len(invalid_indices)/truthTaus.shape[0])+"%) invalid events, dropping...")
     #Drop invalid events
     event = np.delete(event, invalid_indices, axis=0)
     tracks = np.delete(tracks, invalid_indices, axis=0)

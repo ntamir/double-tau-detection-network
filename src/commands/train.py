@@ -25,6 +25,8 @@ def train_module(dataset, model, output_folder, options={}):
 
   optimizer = Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
   criterion = CylindricalLoss()
+  
+  epochs = int(options.get('epochs', EPOCHS))
 
   use_cuda = torch.cuda.is_available()
   if use_cuda:
@@ -45,7 +47,7 @@ def train_module(dataset, model, output_folder, options={}):
   print(f'split:                            {split}')
   print('Using Multiprocessing:            ' + ('yes' if using_multiprocessing else 'no'))
   print(f'Batch Size:                       {BATCH_SIZE}')
-  print(f'Epochs:                           {EPOCHS}')
+  print(f'Epochs:                           {epochs}')
 
   if full_preload:
     dataset.full_preload()
@@ -139,7 +141,6 @@ def preload (loader):
 # train the model
 def train(train_loader, model, criterion, optimizer, epoch):
   model.train()
-  total_loss = 0
   def run (next):
     total_loss = 0
     for batch_idx, (input, target) in enumerate(train_loader):
@@ -151,7 +152,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
       total_loss += loss.item()
     return total_loss
 
-  total_loss = long_operation(run, max=len(train_loader) * BATCH_SIZE, message=f'Epoch {epoch+1} training', ending_message=lambda: f'loss: {total_loss / len(train_loader):.4f}')
+  total_loss = long_operation(run, max=len(train_loader) * BATCH_SIZE, message=f'Epoch {epoch+1} training')
   return total_loss / len(train_loader)
 
 # validate the model

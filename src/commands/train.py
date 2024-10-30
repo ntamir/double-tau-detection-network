@@ -168,7 +168,7 @@ def validate(val_loader, model, criterion, epoch):
         total_loss += loss.item()
       return total_loss
   
-    total_loss = long_operation(run, max=len(val_loader) * BATCH_SIZE, message=f'Epoch {epoch+1} validation', ending_message=lambda: f'loss: {total_loss / len(val_loader):.4f}')
+    total_loss = long_operation(run, max=len(val_loader) * BATCH_SIZE, message=f'Epoch {epoch+1} validation')
   return total_loss / len(val_loader)
 
 # test the model

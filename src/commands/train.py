@@ -140,7 +140,7 @@ def preload (loader):
 # train the model
 def train(train_loader, model, criterion, optimizer, epoch):
   model.train()
-  
+  total_loss = 0
   def run (next):
     total_loss = 0
     for batch_idx, (input, target) in enumerate(train_loader):

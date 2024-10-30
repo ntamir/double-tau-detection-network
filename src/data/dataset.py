@@ -106,7 +106,7 @@ class EventsDataset (Dataset):
     self._fields = { f'{field}_fields': [(name, python_name_from_dtype_name(name)) for name in self.raw_data[field].dtype.names] for field in self.dataset_fields }
     self.featuredims = {f'{field}':(len(self.raw_data[field][0][0]) if field != 'event' else len(self.raw_data[field][0])) for field in self.dataset_fields}
     self.constitdims = {f'{field}':(self.raw_data[field].shape[1] if field != 'event' else 1) for field in self.dataset_fields}
-    self.arrays = {f'{field}':np.array(self.raw_data[field].tolist()).reshape(self.nevts, self.constitdims[field], self.featuredims[field]) for field in self.dataset_fields}
+    self.arrays = {f'{field}':np.array(self.raw_data[field][:].tolist()).reshape(self.nevts, self.constitdims[field], self.featuredims[field]) for field in self.dataset_fields}
   
   def full_preload (self):
     self.preloaded = True

@@ -68,8 +68,11 @@ def train_module(dataset, model, output_folder, options={}):
       preload(validation_loader)
     for epoch in range(epochs):
       epoch_start_times.append(time.time())
+      traintime_start = time.time()
       training_loss = train(train_loader, model, criterion, optimizer, epoch)
+      valtime_start = time.time()
       validation_loss = validate(validation_loader, model, criterion, epoch)
+      print("Training time: {:.2f}s, Validation time: {:.2f}s".format(valtime_start - traintime_start, time.time() - valtime_start))
       print("Training Loss: {:.6f}, Validation Loss: {:.6f}".format(training_loss, validation_loss))
       if validation_loss < best_validation_loss:
         best_validation_loss = validation_loss

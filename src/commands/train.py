@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader
 from torch.optim import Adam
 from torch.utils.data import random_split
 from torch.utils.data.dataloader import default_collate
-import numpy as np
 from tqdm import tqdm
 
 from utils import long_operation, seconds_to_time
@@ -30,7 +29,7 @@ def train_module(dataset, model, output_folder, options={}):
   use_cuda = torch.cuda.is_available()
   if use_cuda:
     # init multiprocessing
-    #torch.multiprocessing.set_start_method('spawn')
+    torch.multiprocessing.set_start_method('spawn')
     model = model.cuda()
     print(f'Using Device:                     {torch.cuda.get_device_name(0)}')
   else:
